@@ -12,6 +12,12 @@ export default new Router({
       name: 'login',
       path: '/login',
       component: Login
+    },
+    {
+      // 测试首页也是/login
+      name: 'home',
+      path: '/',
+      redirect: {name: 'login'}
     }
   ]
 });

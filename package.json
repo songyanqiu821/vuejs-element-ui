@@ -10,10 +10,11 @@
     "lint": "eslint --ext .js,.vue src",
     "lintfix": "eslint --ext .js,.vue src --fix",
     "build": "node build/build.js",
-    "prepush":"npm run lint",
-    "push":"git add . && git commit && git push origin dev-login"
+    "prepush": "npm run lint",
+    "push": "git add . && git commit && git push origin dev-login"
   },
   "dependencies": {
+    "element-ui": "^2.4.3",
     "vue": "^2.5.2",
     "vue-router": "^3.0.1"
   },
