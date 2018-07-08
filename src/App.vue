@@ -1,6 +1,6 @@
 <template>
   <div id="app">
-    项目初始化
+    <!-- 匹配路由的组件占位 -->
     <router-view/>
   </div>
 </template>
