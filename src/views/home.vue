@@ -3,10 +3,10 @@
         <el-header class="header">
             <!-- 栅格系统 -->
             <el-row>
-                <el-col :span="6">
+                <el-col :span="4">
                     <img src="/static/logo.png" alt="">
                 </el-col>
-                <el-col :span="17" class="text">
+                <el-col :span="19" class="text">
                     <h2>电商管理后台系统</h2>
                 </el-col>
                 <el-col :span="1" class="loginout">
@@ -16,17 +16,18 @@
         </el-header>
         <el-container>
             <el-aside width="200px" class="sidebar">
+                <!-- :router="true"允许使用 vue-router 的模式 -->
                 <el-menu
-                    default-active="2"
-                    class="el-menu-vertical-demo"
-                    unique-opened>
+                    :router="true"
+                    :unique-opened="true"
+                    class="menu">
                     <el-submenu index="1">
                         <template slot="title">
                         <i class="el-icon-location"></i>
                         <span>用户管理</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="1-1">
+                            <el-menu-item index="/users">
                                  <i class="el-icon-menu"></i>
                                 用户列表
                             </el-menu-item>
@@ -38,11 +39,11 @@
                         <span>权限管理</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="2-1">
+                            <el-menu-item index="/roles">
                                  <i class="el-icon-menu"></i>
                                 角色列表
                             </el-menu-item>
-                            <el-menu-item index="2-2">
+                            <el-menu-item index="/rights">
                                  <i class="el-icon-menu"></i>
                                 权限列表
                             </el-menu-item>
@@ -96,7 +97,11 @@
                 </el-menu>
             </el-aside>
            <!-- 主题 -->
-        </el-container>
+           <el-main class="main">
+             <!-- 给匹配路由的组件站位 -->
+                <router-view></router-view>
+            </el-main>
+        </el-container>        
     </el-container>
 </template>
 <script>
@@ -132,7 +137,7 @@ export default {
 }
 .container .header{
     background-color:#b3c0d1;
-    padding-left:0;
+    padding:0;
 }
 .header .text{
     line-height: 60px;
@@ -143,11 +148,20 @@ export default {
     line-height: 60px;
     color:darkgoldenrod;
 }
+.container .sidebar{
+    height: 100%;
+    background-color: #d3dce6;
+}
+.sidebar .menu{
+    height:100%;
+}
 .container .el-menu{
     border-right:none;
 }
-.box-card{
-    height: 100%;
+
+.main {
+  background-color: #e9eef3;
+  height: 100%;
 }
 
 </style>

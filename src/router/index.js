@@ -4,6 +4,8 @@ import Router from 'vue-router';
 import Login from '@/views/login';
 // 导入首页组件
 import Home from '@/views/home';
+// 导入用户列表组件
+import Users from '@/views/users/users';
 
 Vue.use(Router);
 
@@ -19,7 +21,17 @@ export default new Router({
       // 配置首页路由规则
       name: 'home',
       path: '/',
-      component: Home
+      component: Home,
+      // 子路由，将来子路由的切换 是在Home组件中完成的
+      // 子路由使用之前，home组件已经创建完毕
+      children: [
+        // 用户列表
+        {
+          name: 'users',
+          path: '/users',
+          component: Users
+        }
+      ]
     }
   ]
 });
