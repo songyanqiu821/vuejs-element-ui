@@ -101,10 +101,16 @@
 </template>
 <script>
 export default {
-  data() {
-    return {
-
-    };
+  // 判断是否登录
+  beforeCreate() {
+    // 获取sessionStrage中的token  ，并判断token是否存在
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      // 如果不存在token则返回登录页面
+      this.$router.push({name: 'login'});
+      // 提示
+      this.$message.warning('请先登录');
+    }
   }
 };
 </script>
