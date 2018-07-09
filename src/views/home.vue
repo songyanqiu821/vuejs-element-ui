@@ -97,11 +97,11 @@
                 </el-menu>
             </el-aside>
            <!-- 主题 -->
-           <el-main class="main">
+            <el-main class="main">
              <!-- 给匹配路由的组件站位 -->
                 <router-view></router-view>
             </el-main>
-        </el-container>        
+        </el-container>
     </el-container>
 </template>
 <script>
@@ -136,7 +136,7 @@ export default {
     height: 100%;
 }
 .container .header{
-    background-color:#b3c0d1;
+    background-color: #b3c0d1;
     padding:0;
 }
 .header .text{
@@ -158,10 +158,8 @@ export default {
 .container .el-menu{
     border-right:none;
 }
-
-.main {
-  background-color: #e9eef3;
-  height: 100%;
+.main{
+    background-color: #e9eef3;
 }
 
 </style>
