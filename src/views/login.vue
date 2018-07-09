@@ -47,6 +47,8 @@ export default {
         sessionStorage.setItem('token', token);
         // 提示
         this.$message.success(msg);
+        // 跳转到首页
+        this.$router.push({name: 'home'});
       } else {
         // 登录失败、
         // 提示

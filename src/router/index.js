@@ -2,6 +2,8 @@ import Vue from 'vue';
 import Router from 'vue-router';
 // 导入登录组件
 import Login from '@/views/login';
+// 导入首页组件
+import Home from '@/views/home';
 
 Vue.use(Router);
 
@@ -14,10 +16,10 @@ export default new Router({
       component: Login
     },
     {
-      // 测试首页也是/login
+      // 配置首页路由规则
       name: 'home',
       path: '/',
-      redirect: {name: 'login'}
+      component: Home
     }
   ]
 });
