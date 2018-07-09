@@ -35,29 +35,23 @@ export default {
   },
   methods: {
     // 点击登录按钮 触发事件
-    hanleLogin() {
-      this.$http
-        .post('login', this.formData)
-        .then((res) => {
-          const data = res.data;
-          // 测试的话一定要将后台服务器打开
-          //   注意数据格式
-          const {meta: {status, msg}} = data;
-          //   console.log(data);
-          if (status === 200) {
-            //   登录成功
-            // 获取token
-            const token = data.data.token;
-            // 记录token sessionStorage
-            sessionStorage.setItem('token', token);
-            // console.log(token);
-            // 提示
-            this.$message.success(msg);
-          } else {
-            //   登录失败 $message.error是element-ui提供的方法
-            this.$message.error(msg);
-          }
-        });
+    async hanleLogin() {
+      const res = await this.$http.post('login', this.formData);
+      // 下面的代码就相当于回调函数中的代码
+      const data = res.data;
+      const {meta: {status, msg}} = data;
+      if (status === 200) {
+        // 登录成功
+        // 获取token 并记录token 和sessionStorge
+        const token = data.data.token;
+        sessionStorage.setItem('token', token);
+        // 提示
+        this.$message.success(msg);
+      } else {
+        // 登录失败、
+        // 提示
+        this.$message.error(msg);
+      }
     }
   }
 };
