@@ -10,7 +10,7 @@
                     <h2>电商管理后台系统</h2>
                 </el-col>
                 <el-col :span="1" class="loginout">
-                    <a href="#">退出</a>
+                    <a href="#" @click="hanleLoginout">退出</a>
                 </el-col>
             </el-row>
         </el-header>
@@ -110,6 +110,17 @@ export default {
       this.$router.push({name: 'login'});
       // 提示
       this.$message.warning('请先登录');
+    }
+  },
+  methods: {
+    //   点击退出按钮触发事件
+    hanleLoginout() {
+      //   清除token和session
+      sessionStorage.clear();
+      // 提示
+      this.$message.success('退出成功');
+      // 跳转到登录页
+      this.$router.push({name: 'login'});
     }
   }
 };
