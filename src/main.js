@@ -8,6 +8,11 @@ import UI from 'element-ui';
 import 'element-ui/lib/theme-chalk/index.css';
 // 导入index.css
 import '@/assets/css/index.css';
+// 导入axios插件
+import myAxios from '@/plugins/axios';
+
+// 注册插件
+Vue.use(myAxios);
 
 // 注册插件
 Vue.use(UI);

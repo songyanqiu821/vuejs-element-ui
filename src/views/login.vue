@@ -3,21 +3,22 @@
 <!-- 此处使用的布局框架是element-ui -->
     <div class="login-wrap">
         <!-- top顶端对齐 -->
-        <!-- :model="fromData"绑定表单 -->
+        <!-- :model="formData"绑定表单 -->
         <el-form
         label-position="top"
         label-width="80px"
+        :model="formData"
         class="login-form">
             <h2>用户登录</h2>
             <el-form-item label="用户名">
-                <!-- v-model="fromData.username" -->
-                <el-input ></el-input>
+                <!-- v-model="formData.username" -->
+                <el-input v-model="formData.username" ></el-input>
             </el-form-item>
             <el-form-item label="密码">
-                <!-- v-model="fromData.password" -->
-                <el-input ></el-input>
+                <!-- v-model="formData.password" -->
+                <el-input v-model="formData.password"></el-input>
             </el-form-item>
-        <el-button type="primary" class="login-button">登录</el-button>
+        <el-button @click="hanleLogin" type="primary" class="login-button">登录</el-button>
         </el-form>
     </div>
 </template>
@@ -26,8 +27,38 @@
 export default {
   data () {
     return {
-
+      formData: {
+        username: '',
+        password: ''
+      }
     };
+  },
+  methods: {
+    // 点击登录按钮 触发事件
+    hanleLogin() {
+      this.$http
+        .post('login', this.formData)
+        .then((res) => {
+          const data = res.data;
+          // 测试的话一定要将后台服务器打开
+          //   注意数据格式
+          const {meta: {status, msg}} = data;
+          //   console.log(data);
+          if (status === 200) {
+            //   登录成功
+            // 获取token
+            const token = data.data.token;
+            // 记录token sessionStorage
+            sessionStorage.setItem('token', token);
+            // console.log(token);
+            // 提示
+            this.$message.success(msg);
+          } else {
+            //   登录失败 $message.error是element-ui提供的方法
+            this.$message.error(msg);
+          }
+        });
+    }
   }
 };
 </script>
