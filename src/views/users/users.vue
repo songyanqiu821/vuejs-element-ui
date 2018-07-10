@@ -16,7 +16,7 @@
                 <el-input v-model="searchValue" @change = "hanleShowData" class="searchInput" clearable placeholder="请输入内容">
                 <el-button @click="handleSearch" slot="append" icon="el-icon-search"></el-button>
                 </el-input>
-                <el-button type="success" plain >添加用户</el-button>
+                <el-button type="success" plain @click="AdddialogFormVisible = true">添加用户</el-button>
             </el-col>
         </el-row>
         <!-- 表格 -->
@@ -100,6 +100,28 @@
             layout="total, sizes, prev, pager, next, jumper"
             :total="total">
         </el-pagination>
+
+        <!-- 添加用户 -->
+        <el-dialog title="添加用户" :visible.sync="AdddialogFormVisible">
+            <el-form :model="formDate"  label-width="100px">
+                <el-form-item label="用户名" >
+                    <el-input v-model="formDate.username" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item type="password" label="密码" >
+                    <el-input v-model="formDate.password" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" >
+                    <el-input v-model="formDate.email" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="电话" >
+                    <el-input v-model="formDate.mobile" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="AdddialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="AdddialogFormVisible = false">确 定</el-button>
+            </div>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -109,6 +131,14 @@ export default {
     return {
       // 用户列表信息
       list: [],
+    //   绑定表单
+      formDate:{
+          username:'',
+          password:'',
+          eamil:'',
+          mobile:''
+      },
+      AdddialogFormVisible:false,
       //   绑定文本框
       searchValue: '',
       //   分页相关的数据
