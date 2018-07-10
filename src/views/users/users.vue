@@ -14,7 +14,7 @@
                     <!-- Table Slot文档中有具体的说明 -->
                 <el-button slot="append" icon="el-icon-search"></el-button>
                 </el-input>
-                <el-button type="success" plain>添加用户</el-button>
+                <el-button type="success" plain >添加用户</el-button>
             </el-col>
         </el-row>
         <!-- 表格 -->
@@ -77,6 +77,25 @@
                 </template>
             </el-table-column>
         </el-table>
+        <!-- 分页 -->
+        <!-- @size-change 每页多少条数据发生改变 触发的事件 -->
+        <!-- @current-change 当前页码改变发生 -->
+        <!-- current-page 当前页码 -->
+        <!-- page-sizes 每页多少条数据的下拉框 -->
+        <!-- page-size 每页显示多少条数据 -->
+
+        <!-- total  总条数 -->
+
+        <!-- layout 分页所支持的功能 -->
+        <el-pagination
+        @size-change="handleSizeChange"
+        @current-change="handleCurrentChange"
+        :current-page="pagenum"
+        :page-sizes="[2, 4, 6, 8]"
+        :page-size="pagesize"
+        layout="total, sizes, prev, pager, next, jumper"
+        :total="total">
+        </el-pagination>
     </el-card>
 </template>
 
@@ -85,7 +104,11 @@ export default {
   data() {
     return {
       // 用户列表信息
-      list: []
+      list: [],
+      //   分页相关的数据
+      pagenum: 1, // 页码
+      pagesize: 100, // 每页条数
+      total: 0 // 总共的数据条数，从服务器获取
     };
   },
   created() {
@@ -93,6 +116,19 @@ export default {
     this.loadData();
   },
   methods: {
+    //   分页功能
+    handleSizeChange(val) {
+      // 当每页的条数改变的时候
+      this.pagesize = val;
+      this.loadData();
+      console.log(`每页 ${val} 条`);
+    },
+    handleCurrentChange(val) {
+      // 当当前页码改变的时候、
+      this.pagenum = val;
+      this.loadData();
+      console.log(`当前页: ${val}`);
+    },
     // 发送异步请求，获取数据
     async loadData() {
       // 发送异步请求之前
@@ -103,7 +139,7 @@ export default {
       // 在请求头中设置token
       this.$http.defaults.headers.common['Authorization'] = token;
 
-      const res = await this.$http.get('users?pagenum=1&pagesize=10');
+      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
 
       // 异步请求结束
       this.loading = false;
@@ -113,8 +149,10 @@ export default {
       // meta中的msg 和 status
       const { meta: { msg, status } } = data;
       if (status === 200) {
-        const { data: { users } } = data;
+        const { data: {users, total} } = data;
         this.list = users;
+        // 获取总共的条数
+        this.total = total;
       } else {
         this.$message.error(msg);
       }
@@ -129,5 +167,9 @@ export default {
 }
 .box-card .searchInput{
     width: 400px;
+}
+.el-table {
+    margin-top:10px;
+    margin-bottom :10px;
 }
 </style>
