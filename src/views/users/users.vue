@@ -75,7 +75,7 @@
             <el-table-column
                 label="操作">
                 <template slot-scope="scope">
-                <el-button plain size="mini" type="primary" icon="el-icon-edit" ></el-button>
+                <el-button @click="EditShowFormVisible(scope.row)" size="mini" type="primary" icon="el-icon-edit" ></el-button>
                 <el-button  @click="handleDelete(scope.row.id)" size="mini" type="danger" icon="el-icon-delete" ></el-button>
                 <el-button plain size="mini" type="success" icon="el-icon-check" ></el-button>
                 </template>
@@ -122,6 +122,24 @@
                 <el-button type="primary" @click="Adduserialog">确 定</el-button>
             </div>
         </el-dialog>
+        <!-- 编辑用户 -->
+        <el-dialog title="编辑用户" :visible.sync="EditdialogFormVisible" >
+            <el-form :model="formDate"  label-width="100px" :rules="formRules" ref="ruleForm">
+                <el-form-item label="用户名" prop ="username" >
+                    <el-input v-model="formDate.username" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="邮箱" >
+                    <el-input v-model="formDate.email" auto-complete="off"></el-input>
+                </el-form-item>
+                <el-form-item label="电话" >
+                    <el-input v-model="formDate.mobile" auto-complete="off"></el-input>
+                </el-form-item>
+            </el-form>
+            <div slot="footer" class="dialog-footer">
+                <el-button @click="EditdialogFormVisible = false">取 消</el-button>
+                <el-button type="primary" @click="EditdialogFormVisible=false">确 定</el-button>
+            </div>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -151,6 +169,8 @@ export default {
       },
       //   控制添加用户的对话框显示或者隐藏
       AdddialogFormVisible: false,
+      //   控制编辑用户的对话框显示或者隐藏
+      EditdialogFormVisible: false,
       //   绑定文本框
       searchValue: '',
       //   分页相关的数据
@@ -287,6 +307,14 @@ export default {
           message: '已取消删除'
         });
       });
+    },
+    // 当点击编辑图标的时候 弹出对话框 并展示对应id的用户信息
+    EditShowFormVisible(user) {
+      // 弹出编辑对话框
+      this.EditdialogFormVisible = true;
+      this.formDate.username = user.username;
+      this.formDate.email = user.email;
+      this.formDate.mobile = user.mobile;
     }
   }
 };
