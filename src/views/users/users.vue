@@ -8,11 +8,14 @@
             <el-breadcrumb-item>用户列表</el-breadcrumb-item>
         </el-breadcrumb>
         <!-- 搜索框 -->
-        <el-row class="searchArea">
+        <!-- 搜索功能
+        1、绑定文本框
+        2、给搜索按钮绑定事件 -->
+        <el-row class="searchArea" >
             <el-col :span="24">
-                <el-input class="searchInput" clearable placeholder="请输入内容">
+                <el-input v-model="searchValue" class="searchInput" clearable placeholder="请输入内容">
                     <!-- Table Slot文档中有具体的说明 -->
-                <el-button slot="append" icon="el-icon-search"></el-button>
+                <el-button @click="handleSearch" slot="append" icon="el-icon-search" ></el-button>
                 </el-input>
                 <el-button type="success" plain >添加用户</el-button>
             </el-col>
@@ -105,6 +108,8 @@ export default {
     return {
       // 用户列表信息
       list: [],
+      //   绑定文本框
+      searchValue: '',
       //   分页相关的数据
       pagenum: 1, // 页码
       pagesize: 100, // 每页条数
@@ -139,7 +144,7 @@ export default {
       // 在请求头中设置token
       this.$http.defaults.headers.common['Authorization'] = token;
 
-      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}`);
+      const res = await this.$http.get(`users?pagenum=${this.pagenum}&pagesize=${this.pagesize}&query=${this.searchValue}`);
 
       // 异步请求结束
       this.loading = false;
@@ -156,6 +161,11 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    // 搜索功能
+    handleSearch() {
+      // 带上查询参数
+      this.loadData();
     }
   }
 };
