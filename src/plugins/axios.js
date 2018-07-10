@@ -4,7 +4,7 @@ var myAxios = {};
 myAxios.install = function(Vue) {
   // 创建一个axios实例
   var instance = axios.create({
-    baseURL: 'http://localhost:8888/api/private/v1/'
+    baseURL: 'http://192.168.129.44:8888/api/private/v1/'
   });
   Vue.prototype.$http = instance;
 };

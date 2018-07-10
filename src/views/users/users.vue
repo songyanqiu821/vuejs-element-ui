@@ -13,9 +13,8 @@
         2、给搜索按钮绑定事件 -->
         <el-row class="searchArea" >
             <el-col :span="24">
-                <el-input v-model="searchValue" class="searchInput" clearable placeholder="请输入内容">
-                    <!-- Table Slot文档中有具体的说明 -->
-                <el-button @click="handleSearch" slot="append" icon="el-icon-search" ></el-button>
+                <el-input v-model="searchValue" @change = "hanleShowData" class="searchInput" clearable placeholder="请输入内容">
+                <el-button @click="handleSearch" slot="append" icon="el-icon-search"></el-button>
                 </el-input>
                 <el-button type="success" plain >添加用户</el-button>
             </el-col>
@@ -64,8 +63,10 @@
                 label="用户状态" width="100">
                 <template slot-scope="scope">
                 <!-- scope.row 就是当前行绑定的数据对象 -->
+
                 <el-switch
                     v-model="scope.row.mg_state"
+                    @change="handleChange(scope.row)"
                     active-color="#13ce66"
                     inactive-color="#ff4949">
                 </el-switch>
@@ -91,13 +92,13 @@
 
         <!-- layout 分页所支持的功能 -->
         <el-pagination
-        @size-change="handleSizeChange"
-        @current-change="handleCurrentChange"
-        :current-page="pagenum"
-        :page-sizes="[2, 4, 6, 8]"
-        :page-size="pagesize"
-        layout="total, sizes, prev, pager, next, jumper"
-        :total="total">
+            @size-change="handleSizeChange"
+            @current-change="handleCurrentChange"
+            :current-page="pagenum"
+            :page-sizes="[2, 4, 6, 8]"
+            :page-size="pagesize"
+            layout="total, sizes, prev, pager, next, jumper"
+            :total="total">
         </el-pagination>
     </el-card>
 </template>
@@ -112,7 +113,7 @@ export default {
       searchValue: '',
       //   分页相关的数据
       pagenum: 1, // 页码
-      pagesize: 100, // 每页条数
+      pagesize: 2, // 每页条数
       total: 0 // 总共的数据条数，从服务器获取
     };
   },
@@ -166,6 +167,23 @@ export default {
     handleSearch() {
       // 带上查询参数
       this.loadData();
+    },
+    // 当搜索文本框的内容改变的时候
+    hanleShowData () {
+      this.loadData();
+    },
+    // 当开关改变的时候
+    async handleChange (user) {
+      const res = await this.$http.put(`users/${user.id}/state/${user.mg_state}`);
+      const data = res.data;
+      const {meta: {status, msg}} = data;
+      if (status === 200) {
+        // 修改状态成功
+        // 提示
+        this.$message.success(msg);
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
