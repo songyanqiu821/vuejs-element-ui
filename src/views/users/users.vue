@@ -102,12 +102,12 @@
         </el-pagination>
 
         <!-- 添加用户 -->
-        <el-dialog title="添加用户" :visible.sync="AdddialogFormVisible">
-            <el-form :model="formDate"  label-width="100px">
-                <el-form-item label="用户名" >
+        <el-dialog title="添加用户" :visible.sync="AdddialogFormVisible" >
+            <el-form :model="formDate"  label-width="100px" :rules="formRules" ref="ruleForm">
+                <el-form-item label="用户名" prop ="username" >
                     <el-input v-model="formDate.username" auto-complete="off"></el-input>
                 </el-form-item>
-                <el-form-item type="password" label="密码" >
+                <el-form-item type="password" label="密码"  prop ="password">
                     <el-input v-model="formDate.password" auto-complete="off"></el-input>
                 </el-form-item>
                 <el-form-item label="邮箱" >
@@ -131,15 +131,26 @@ export default {
     return {
       // 用户列表信息
       list: [],
-    //   绑定表单
-      formDate:{
-          username:'',
-          password:'',
-          eamil:'',
-          mobile:''
+      //   绑定表单
+      formDate: {
+        username: '',
+        password: '',
+        eamil: '',
+        mobile: ''
       },
-    //   控制添加用户的对话框显示或者隐藏
-      AdddialogFormVisible:false,
+      //   表单验证规则  自定义
+      formRules: {
+        username: [
+          { required: true, message: '请输入用户名', trigger: 'blur' },
+          { min: 3, max: 8, message: '长度在 3 到 8 个字符', trigger: 'blur' }
+        ],
+        password: [
+          { required: true, message: '请输入密码', trigger: 'blur' },
+          { min: 4, max: 11, message: '长度在 4 到 11 个字符', trigger: 'blur' }
+        ]
+      },
+      //   控制添加用户的对话框显示或者隐藏
+      AdddialogFormVisible: false,
       //   绑定文本框
       searchValue: '',
       //   分页相关的数据
@@ -216,27 +227,34 @@ export default {
         this.$message.error(msg);
       }
     },
-    // 当点击添加用户对话框中的确定按钮执行 
+    // 当点击添加用户对话框中的确定按钮执行
     async Adduserialog() {
-        const res = await this.$http.post('users',this.formDate);
-        const data =res.data;
-        const {meta:{status,msg}} = data;
-        if(status === 201) {
-            // 用户添加成功
-            // 隐藏对话框
-            this.AdddialogFormVisible = false;
-            // 提示
-            this.$message.success(msg);
-            // 重新加载数据
-            this.loadData();
-            // 清空对话框 ---》遍历formDate
-            for (let key  in this.formDate) {
-                this.formDate[key] ='';
-            }
-        }else {
-            // 用户添加失败
-            this.$message.error(msg);
+      // this.$refs[ruleForm]表单的DOM对象 ===this.$refs.ruleForm
+      this.$refs.ruleForm.validate(async (valid) => {
+        if (!valid) {
+          return this.$message.error('请完整输入内容');
         }
+        // 表单验证成功，添加的操作
+        const res = await this.$http.post('users', this.formDate);
+        const data = res.data;
+        const {meta: {status, msg}} = data;
+        if (status === 201) {
+          // 用户添加成功
+          // 隐藏对话框
+          this.AdddialogFormVisible = false;
+          // 提示
+          this.$message.success(msg);
+          // 重新加载数据
+          this.loadData();
+          // 清空对话框 ---》遍历formDate
+          for (let key in this.formDate) {
+            this.formDate[key] = '';
+          }
+        } else {
+          // 用户添加失败
+          this.$message.error(msg);
+        }
+      });
     }
   }
 };
