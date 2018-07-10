@@ -119,7 +119,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="AdddialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="AdddialogFormVisible = false">确 定</el-button>
+                <el-button type="primary" @click="Adduserialog">确 定</el-button>
             </div>
         </el-dialog>
     </el-card>
@@ -138,12 +138,13 @@ export default {
           eamil:'',
           mobile:''
       },
+    //   控制添加用户的对话框显示或者隐藏
       AdddialogFormVisible:false,
       //   绑定文本框
       searchValue: '',
       //   分页相关的数据
       pagenum: 1, // 页码
-      pagesize: 2, // 每页条数
+      pagesize: 6, // 每页条数
       total: 0 // 总共的数据条数，从服务器获取
     };
   },
@@ -214,6 +215,28 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    // 当点击添加用户对话框中的确定按钮执行 
+    async Adduserialog() {
+        const res = await this.$http.post('users',this.formDate);
+        const data =res.data;
+        const {meta:{status,msg}} = data;
+        if(status === 201) {
+            // 用户添加成功
+            // 隐藏对话框
+            this.AdddialogFormVisible = false;
+            // 提示
+            this.$message.success(msg);
+            // 重新加载数据
+            this.loadData();
+            // 清空对话框 ---》遍历formDate
+            for (let key  in this.formDate) {
+                this.formDate[key] ='';
+            }
+        }else {
+            // 用户添加失败
+            this.$message.error(msg);
+        }
     }
   }
 };
