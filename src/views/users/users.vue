@@ -126,7 +126,8 @@
         <el-dialog title="编辑用户" :visible.sync="EditdialogFormVisible" >
             <el-form :model="formDate"  label-width="100px" :rules="formRules" ref="ruleForm">
                 <el-form-item label="用户名" prop ="username" >
-                    <el-input v-model="formDate.username" auto-complete="off"></el-input>
+                    <el-input disabled v-model="formDate.username" auto-complete="off">
+                    </el-input>
                 </el-form-item>
                 <el-form-item label="邮箱" >
                     <el-input v-model="formDate.email" auto-complete="off"></el-input>
@@ -137,7 +138,7 @@
             </el-form>
             <div slot="footer" class="dialog-footer">
                 <el-button @click="EditdialogFormVisible = false">取 消</el-button>
-                <el-button type="primary" @click="EditdialogFormVisible=false">确 定</el-button>
+                <el-button type="primary" @click="handleEdit">确 定</el-button>
             </div>
         </el-dialog>
     </el-card>
@@ -315,6 +316,32 @@ export default {
       this.formDate.username = user.username;
       this.formDate.email = user.email;
       this.formDate.mobile = user.mobile;
+      this.formDate.id = user.id;
+    },
+    // 当点击编辑用户对话框中的确定按钮执行
+    async handleEdit () {
+      console.log(this.formDate);
+      const res = await this.$http.put(`users/${this.formDate.id}`, {
+        mobile: this.formDate.mobile,
+        email: this.formDate.email
+      });
+      const data = res.data;
+      const {meta: {status, msg}} = data;
+      if (status === 200) {
+        // 修改成功
+        // 提示
+        this.$message.success(msg);
+        // 隐藏对话框
+        this.EditdialogFormVisible = false;
+        // 重新加载数据
+        this.loadData();
+        // 清空文本框
+        for (let key in this.formDate) {
+          this.formDate[key] = '';
+        }
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
