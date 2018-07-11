@@ -6,6 +6,11 @@ import Login from '@/views/login';
 import Home from '@/views/home';
 // 导入用户列表组件
 import Users from '@/views/users/users';
+// 导入权限列表组件
+import Right from '@/views/rights/right';
+// 导入角色列表组件
+import Role from '@/views/rights/role';
+
 
 Vue.use(Router);
 
@@ -30,6 +35,18 @@ export default new Router({
           name: 'users',
           path: '/users',
           component: Users
+        },
+        // 权限列表
+        {
+          name:'right',
+          path:'/rights',
+          component:Right
+        },
+        // 角色列表路由配置
+        {
+          name:'role',
+          path:'/roles',
+          component:Role
         }
       ]
     }
