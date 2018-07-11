@@ -77,7 +77,7 @@
                 <template slot-scope="scope">
                 <el-button @click="EditShowFormVisible(scope.row)" size="mini" type="primary" icon="el-icon-edit" ></el-button>
                 <el-button  @click="handleDelete(scope.row.id)" size="mini" type="danger" icon="el-icon-delete" ></el-button>
-                <el-button plain size="mini" type="success" icon="el-icon-check" ></el-button>
+                <el-button @click="handlesetShowRoles(scope.row)" plain size="mini" type="success" icon="el-icon-check" ></el-button>
                 </template>
             </el-table-column>
         </el-table>
@@ -102,7 +102,8 @@
         </el-pagination>
 
         <!-- 添加用户 -->
-        <el-dialog title="添加用户" :visible.sync="AdddialogFormVisible" >
+        <!-- @closed="handleClosed Dialog 关闭的回调 -->
+        <el-dialog title="添加用户" :visible.sync="AdddialogFormVisible"  @closed="handleClosed">
             <el-form :model="formDate"  label-width="100px" :rules="formRules" ref="ruleForm">
                 <el-form-item label="用户名" prop ="username" >
                     <el-input v-model="formDate.username" auto-complete="off"></el-input>
@@ -123,7 +124,7 @@
             </div>
         </el-dialog>
         <!-- 编辑用户 -->
-        <el-dialog title="编辑用户" :visible.sync="EditdialogFormVisible" >
+        <el-dialog title="编辑用户"  @closed="handleClosed"  :visible.sync="EditdialogFormVisible" >
             <el-form :model="formDate"  label-width="100px" :rules="formRules" ref="ruleForm">
                 <el-form-item label="用户名" prop ="username" >
                     <el-input disabled v-model="formDate.username" auto-complete="off">
@@ -141,6 +142,32 @@
                 <el-button type="primary" @click="handleEdit">确 定</el-button>
             </div>
         </el-dialog>
+        <!-- 分配用户角色的弹出框 -->
+        <el-dialog title="分配角色" :visible.sync="setRoleDialogVisible">
+          <el-form
+            label-width="100px">
+            <el-form-item  disabled label="用户名" prop="username">
+              {{ currentUserName }}
+            </el-form-item>
+            <el-form-item label="角色">
+              <el-select v-model="currentRoleId">
+                <!-- 注意：下拉框绑定的值的类型，应该跟option的value的值的类型是一致的 -->
+                <el-option disabled label="请选择" :value="-1">
+                </el-option>
+                <el-option
+                  v-for="item in roles"
+                  :key="item.id"
+                  :label="item.roleName"
+                  :value="item.id">
+                </el-option>
+              </el-select>
+            </el-form-item>
+          </el-form>
+          <div slot="footer" class="dialog-footer">
+            <el-button @click="setRoleDialogVisible = false">取 消</el-button>
+            <el-button type="primary" @click="setRole">确 定</el-button>
+          </div>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -150,6 +177,8 @@ export default {
     return {
       // 用户列表信息
       list: [],
+      // 加载
+      loading: true,
       //   绑定表单
       formDate: {
         username: '',
@@ -157,6 +186,10 @@ export default {
         eamil: '',
         mobile: ''
       },
+      // 角色列表的相关数据
+      currentUserName: '',
+      currentRoleId: -1,
+      roles: [],
       //   表单验证规则  自定义
       formRules: {
         username: [
@@ -172,6 +205,8 @@ export default {
       AdddialogFormVisible: false,
       //   控制编辑用户的对话框显示或者隐藏
       EditdialogFormVisible: false,
+      // 控制角色用户的对话框显示或者隐藏
+      setRoleDialogVisible: false,
       //   绑定文本框
       searchValue: '',
       //   分页相关的数据
@@ -268,9 +303,9 @@ export default {
           // 重新加载数据
           this.loadData();
           // 清空对话框 ---》遍历formDate
-          for (let key in this.formDate) {
-            this.formDate[key] = '';
-          }
+          // for (let key in this.formDate) {
+          //   this.formDate[key] = '';
+          // }
         } else {
           // 用户添加失败
           this.$message.error(msg);
@@ -336,10 +371,52 @@ export default {
         // 重新加载数据
         this.loadData();
         // 清空文本框
-        for (let key in this.formDate) {
-          this.formDate[key] = '';
-        }
+        // for (let key in this.formDate) {
+        //   this.formDate[key] = '';
+        // }
       } else {
+        this.$message.error(msg);
+      }
+    },
+    // 添加用户和编辑用户时清空文本框的操作
+    handleClosed () {
+      for (let key in this.formDate) {
+        this.formDate[key] = '';
+      }
+    },
+    // 点击按钮  显示对话框并显示列表
+    async handlesetShowRoles (user) {
+      // 记录当前用户的id
+      this.currentUserId = user.id;
+      // 弹出对话框
+      this.setRoleDialogVisible = true;
+      // 发送请求
+      const res = await this.$http.get('roles');
+      this.currentUserName = user.username;
+      this.roles = res.data.data;
+      // 根据用户id查询用户对象，角色id
+      const res1 = await this.$http.get(`users/${user.id}`);
+      this.currentRoleId = res1.data.data.rid;
+    },
+    // 点击确认按钮触发的事件
+    async setRole(id) {
+      const res = await this.$http.put(`users/${this.currentUserId}/role`, {
+        rid: this.currentRoleId
+      });
+      const data = res.data;
+      const { meta: { status, msg } } = data;
+      if (status === 200) {
+        // 成功
+        // 关闭对话框
+        this.setRoleDialogVisible = false;
+        // 提示
+        this.$message.success(msg);
+        // 重置数据
+        this.currentUserName = '';
+        this.currentUserId = -1;
+        this.currentRoleId = -1;
+      } else {
+        // 失败
         this.$message.error(msg);
       }
     }
