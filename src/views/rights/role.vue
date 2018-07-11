@@ -15,7 +15,58 @@
             stripe
             :data="list"
             style="width: 100%">
+            <!-- 展开列
+            思路1、将一行分为2列，第一列是一级，
+            2、再将第二列拆分成2列 一个显示二级 一个显示三级
+            总结：看文档明确后台返回的数据格式-->
             <el-table-column type="expand">
+                <template slot-scope="scope">
+                    <!-- 当前角色中的权限列表 -->
+                    <!-- scope.row 角色对象 ---- roleName, roleDesc, children -->
+                    <!-- 一级权限 item1 -->
+                    <el-row
+                    v-for="item1 in scope.row.children"
+                    :key="item1.id"
+                    class="level1">
+                    <!-- 显示一级权限 -->
+                        <el-col :span="4">
+                            <el-tag
+                                closable
+                                type=''>
+                                {{item1.authName}}
+                            </el-tag>
+                            <i class="el-icon-arrow-right"></i>
+                       </el-col>
+                       <!-- 显示二级和三级列表 -->
+                        <el-col :span="20">
+                            <!-- 显示二级权限列表 -->
+                            <el-row
+                                v-for="item2 in  item1.children"
+                                :key="item2.id"
+                                class="level2">
+                                <el-col :span="4">
+                                   <el-tag
+                                   closable
+                                   type='success'>
+                                        {{item2.authName}}
+                                    </el-tag>
+                                    <i class="el-icon-arrow-right"></i>
+                                </el-col>
+                                <el-col :span="20">
+                                    <!-- 显示三级权限列表 -->
+                                    <el-tag
+                                        type='warning'
+                                        closable
+                                        v-for="item3 in item2.children"
+                                        :key="item3.id"
+                                        class="level3">
+                                        {{item3.authName}}
+                                    </el-tag>
+                                </el-col>
+                            </el-row>
+                        </el-col>
+                    </el-row>
+                </template>
 
             </el-table-column>
             <el-table-column
@@ -69,4 +120,11 @@ export default {
 .addrole{
     margin:20px 0 20px 0;
 }
+.level1{
+    margin-top:10px;
+}
+.level3{
+    margin:5px 5px;
+}
+
 </style>
