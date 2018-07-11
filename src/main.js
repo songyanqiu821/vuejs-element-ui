@@ -12,6 +12,10 @@ import '@/assets/css/index.css';
 import myAxios from '@/plugins/axios';
 // 导入格式化日期
 import moment from 'moment';
+// 导入面包屑组件
+import MyBreadcrumb from '@/components/MyBreadcrumb';
+// 注册全局组件
+Vue.component(MyBreadcrumb.name, MyBreadcrumb);
 // 全局过滤器 格式化日期
 Vue.filter('fmtDate', (value, fmtString) => {
   return moment(value).format(fmtString);

@@ -2,11 +2,12 @@
     <!--  权限列表 -->
     <el-card class= "box-card">
         <!-- 面包屑 -->
-        <el-breadcrumb separator-class="el-icon-arrow-right">
+         <my-breadcrumb level1="权限管理" level2="权限列表"></my-breadcrumb>
+        <!-- <el-breadcrumb separator-class="el-icon-arrow-right">
             <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
             <el-breadcrumb-item>权限管理</el-breadcrumb-item>
             <el-breadcrumb-item>权限列表</el-breadcrumb-item>
-        </el-breadcrumb>
+        </el-breadcrumb> -->
         <!-- 表格 -->
         <!-- :data="list"是ui框架给提供的方法 data是提供的数据 为数组 -->
         <el-table
@@ -15,7 +16,6 @@
             :data="list">
             <el-table-column
                 type="index"
-                :index="id"
                 width="50">
             </el-table-column>
             <el-table-column
@@ -41,27 +41,25 @@
 </template>
 
 <script>
-   export default {
-       data() {
-           return {
+export default {
+  data() {
+    return {
 
-
-
-               list:[]
-           };
-       },
-       created() {
-           this.loadData();
-       },
-       methods:{
-        //    加载数据
-         async  loadData(){
-             const res = await this.$http.get('rights/list');
-             const data = res.data;
-             this.list = data.data;
-           }
-       }
-   };
+      list: []
+    };
+  },
+  created() {
+    this.loadData();
+  },
+  methods: {
+    //    加载数据
+    async  loadData() {
+      const res = await this.$http.get('rights/list');
+      const data = res.data;
+      this.list = data.data;
+    }
+  }
+};
 </script>
 
 <style>

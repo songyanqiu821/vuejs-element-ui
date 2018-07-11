@@ -11,7 +11,6 @@ import Right from '@/views/rights/right';
 // 导入角色列表组件
 import Role from '@/views/rights/role';
 
-
 Vue.use(Router);
 
 export default new Router({
@@ -38,15 +37,15 @@ export default new Router({
         },
         // 权限列表
         {
-          name:'right',
-          path:'/rights',
-          component:Right
+          name: 'right',
+          path: '/rights',
+          component: Right
         },
         // 角色列表路由配置
         {
-          name:'role',
-          path:'/roles',
-          component:Role
+          name: 'role',
+          path: '/roles',
+          component: Role
         }
       ]
     }
