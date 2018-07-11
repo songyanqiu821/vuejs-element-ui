@@ -9,6 +9,7 @@
 <script>
 export default {
   name: 'MyBreadcrumb',
+  // props单向数据传递
   props: ['level1', 'level2']
 };
 </script>
