@@ -30,9 +30,11 @@
                     class="level1">
                     <!-- 显示一级权限 -->
                         <el-col :span="4">
+                            <!-- close是关闭 Tag 时触发的事件 -->
                             <el-tag
                                 closable
-                                type=''>
+                                type=''
+                                @close="handleDeleteright(scope.row,item1.id)">
                                 {{item1.authName}}
                             </el-tag>
                             <i class="el-icon-arrow-right"></i>
@@ -47,7 +49,8 @@
                                 <el-col :span="4">
                                    <el-tag
                                    closable
-                                   type='success'>
+                                   type='success'
+                                    @close="handleDeleteright(scope.row,item2.id)">
                                         {{item2.authName}}
                                     </el-tag>
                                     <i class="el-icon-arrow-right"></i>
@@ -59,7 +62,8 @@
                                         closable
                                         v-for="item3 in item2.children"
                                         :key="item3.id"
-                                        class="level3">
+                                        class="level3"
+                                         @close="handleDeleteright(scope.row,item3.id)">
                                         {{item3.authName}}
                                     </el-tag>
                                 </el-col>
@@ -108,9 +112,27 @@ export default {
   methods: {
     // 加载角色列表
     async loadDate() {
-      const res = await this.$http.get('roles');
-      const data = res.data;
-      this.list = data.data;
+      const {data: resData} = await this.$http.get('roles');
+      const {data, meta: {status, msg}} = resData;
+      if (status === 200) {
+        this.list = data;
+      } else {
+        this.$message.error(msg);
+      }
+    },
+    // 删除指定权限[一定要清楚后台返回的数据是什么格式]
+    async handleDeleteright (role, rightId) {
+      const {data: resData} = await this.$http.delete(`roles/${role.id}/rights/${rightId}`);
+      const {data, meta: {status, msg}} = resData;
+      if (status === 200) {
+        // 成功
+        // 提示
+        this.$message.success(msg);
+        // 重新绑定当前角色的children 权限 实现局部重新加载数据
+        role.children = data;
+      } else {
+        this.$message.error(msg);
+      }
     }
   }
 };
