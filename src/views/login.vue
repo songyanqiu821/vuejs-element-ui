@@ -16,7 +16,7 @@
             </el-form-item>
             <el-form-item label="密码">
                 <!-- v-model="formData.password" -->
-                <el-input v-model="formData.password"></el-input>
+                <el-input @keyup.enter.native="hanleLogin" v-model="formData.password"></el-input>
             </el-form-item>
         <el-button @click="hanleLogin" type="primary" class="login-button">登录</el-button>
         </el-form>

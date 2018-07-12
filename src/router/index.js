@@ -10,10 +10,11 @@ import Users from '@/views/users/users';
 import Right from '@/views/rights/right';
 // 导入角色列表组件
 import Role from '@/views/rights/role';
+import { Message } from 'element-ui';
 
 Vue.use(Router);
 
-export default new Router({
+const router = new Router({
   routes: [
     {
       // 配置登录路由规则
@@ -51,3 +52,24 @@ export default new Router({
     }
   ]
 });
+// 路由的前置守卫
+router.beforeEach((to, from, next) => {
+  // console.log(to, from);
+  // 判断当前访问的路由是否是login，如果是login直接next
+  if (to.name === 'login') {
+    next();
+  } else {
+    // 判断有没有token
+    const token = sessionStorage.getItem('token');
+    if (!token) {
+      // 跳转到登录页面
+      router.push({ name: 'login' });
+      // 提示
+      Message.warning('请先登录');
+      return;
+    }
+    next();
+  }
+});
+
+export default router;
