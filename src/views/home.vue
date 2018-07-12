@@ -21,19 +21,25 @@
                     :router="true"
                     :unique-opened="true"
                     class="menu">
-                    <el-submenu index="1">
+                    <el-submenu
+                        v-for="item in list"
+                        :key="item.id"
+                        :index="item.id +''">
                         <template slot="title">
                         <i class="el-icon-location"></i>
-                        <span>用户管理</span>
+                        <span>{{item.authName}}</span>
                         </template>
                         <el-menu-item-group>
-                            <el-menu-item index="/users">
+                            <el-menu-item
+                                v-for="item1 in item.children"
+                                :key="item1.id"
+                                :index="'/' + item1.path">
                                  <i class="el-icon-menu"></i>
-                                用户列表
+                                {{item1.authName}}
                             </el-menu-item>
                         </el-menu-item-group>
                     </el-submenu>
-                    <el-submenu index="2">
+                    <!-- <el-submenu index="2">
                         <template slot="title">
                         <i class="el-icon-location"></i>
                         <span>权限管理</span>
@@ -92,7 +98,7 @@
                                 数据报表
                             </el-menu-item>
                         </el-menu-item-group>
-                    </el-submenu>
+                    </el-submenu> -->
 
                 </el-menu>
             </el-aside>
@@ -106,6 +112,14 @@
 </template>
 <script>
 export default {
+  data () {
+    return {
+      list: []
+    };
+  },
+  created() {
+    this.loadData();
+  },
   // 判断是否登录
   beforeCreate() {
     // 获取sessionStrage中的token  ，并判断token是否存在
@@ -118,6 +132,16 @@ export default {
     }
   },
   methods: {
+    //   加载左侧菜单的列表
+    async loadData() {
+      const { data: resData } = await this.$http.get('menus');
+      const { data, meta: { status, msg } } = resData;
+      if (status === 200) {
+        this.list = data;
+      } else {
+        this.$message.error(msg);
+      }
+    },
     //   点击退出按钮触发事件
     hanleLoginout() {
       //   清除token和session

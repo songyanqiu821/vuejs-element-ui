@@ -121,6 +121,7 @@
                 <el-button type="primary" @click="handleSetRightsList">确 定</el-button>
             </span>
         </el-dialog>
+
     </el-card>
 </template>
 
