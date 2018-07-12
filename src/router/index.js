@@ -11,6 +11,7 @@ import Right from '@/views/rights/right';
 // 导入角色列表组件
 import Role from '@/views/rights/role';
 import { Message } from 'element-ui';
+import Categogy from '@/views/goods/category';
 
 Vue.use(Router);
 
@@ -47,6 +48,11 @@ const router = new Router({
           name: 'role',
           path: '/roles',
           component: Role
+        },
+        {
+          name: 'category',
+          path: '/categories',
+          component: Categogy
         }
       ]
     }
