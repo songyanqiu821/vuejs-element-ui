@@ -92,10 +92,35 @@
                 <template slot-scope="scope">
                     <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
                     <el-button  type="danger" size="mini" icon="el-icon-delete"></el-button>
-                    <el-button  plain type="success" size="mini" icon="el-icon-check"></el-button>
+                    <el-button @click="SetRights(scope.row)" type="success" size="mini" icon="el-icon-check"></el-button>
                 </template>
             </el-table-column>
         </el-table>
+        <!--   分配权限的对话框
+        open打开对话框的执行-->
+        <el-dialog
+            title="分配权限"
+            :visible.sync="SetRightsdialogVisible"
+            width="30%"
+            @open="handleSetRights">
+            <!-- tree树
+             data: 提供树形数据
+            props: 设置数据中显示的属性-->
+            <el-tree
+                ref="tree"
+                v-loading="loadingTree"
+                :data="treeData"
+                :props="defaultProps"
+                node-key="id"
+                :default-checked-keys="checkedList"
+                show-checkbox
+                default-expand-all>
+            </el-tree>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="SetRightsdialogVisible = false">取 消</el-button>
+                <el-button type="primary" @click="handleSetRightsList">确 定</el-button>
+            </span>
+        </el-dialog>
     </el-card>
 </template>
 
@@ -103,7 +128,21 @@
 export default {
   data() {
     return {
-      list: []
+      list: [],
+      //   控制设置权限的对话框的显示或者隐藏
+      SetRightsdialogVisible: false,
+      loadingTree: true,
+      //   绑定tree上所有的数据
+      treeData: [],
+      // 获取要选择的节点的id
+      checkedList: [],
+      // 记录当前修改的角色id
+      currentRoleId: -1,
+      // 配置要展示数据中的哪个属性
+      defaultProps: {
+        children: 'children',
+        label: 'authName'
+      }
     };
   },
   created() {
@@ -112,7 +151,9 @@ export default {
   methods: {
     // 加载角色列表
     async loadDate() {
+      this.loading = true;
       const {data: resData} = await this.$http.get('roles');
+      this.loading = false;
       const {data, meta: {status, msg}} = resData;
       if (status === 200) {
         this.list = data;
@@ -130,6 +171,60 @@ export default {
         this.$message.success(msg);
         // 重新绑定当前角色的children 权限 实现局部重新加载数据
         role.children = data;
+      } else {
+        this.$message.error(msg);
+      }
+    },
+    // 获取tree上所有数据 当打开对话框的时候执行
+    async handleSetRights() {
+      this.loadingTree = true;
+      const {data: resData} = await this.$http.get('rights/tree');
+      this.loadingTree = false;
+      const { data } = resData;
+      this.treeData = data;
+    },
+    // 点击按钮，显示分配权限的对话框
+    SetRights(role) {
+      // 记录角色id， 分配权限的时候使用
+      this.currentRoleId = role.id;
+
+      this.SetRightsdialogVisible = true;
+      // 获取当前角色所拥有的权限的id
+      // 遍历一级权限
+      const arr = [];
+      role.children.forEach((item1) => {
+        // arr.push(item1.id);
+        // 遍历二级权限
+        item1.children.forEach((item2) => {
+          // arr.push(item2.id);
+          // 遍历三级权限
+          item2.children.forEach((item3) => {
+            arr.push(item3.id);
+          });
+        });
+      });
+      this.checkedList = arr;
+    },
+    // 当点击对话框中的确定按钮的时候,分配权限
+    async handleSetRightsList() {
+      // 获取到被选中的节点的id
+      const checkedKeys = this.$refs.tree.getCheckedKeys();
+      // 获取到半选的节点的id
+      const halfCheckedKeys = this.$refs.tree.getHalfCheckedKeys();
+      //   将上面的两个数组合并
+      const newArray = [...checkedKeys, ...halfCheckedKeys];
+      const { data: resData } = await this.$http.post(`roles/${this.currentRoleId}/rights`, {
+        rids: newArray.join(',')
+      });
+      const { meta: { status, msg } } = resData;
+      if (status === 200) {
+        // 成功
+        // 关闭对话框
+        this.SetRightsdialogVisible = false;
+        // 提示
+        this.$message.success(msg);
+        // 重新加载数据
+        this.loadData();
       } else {
         this.$message.error(msg);
       }
