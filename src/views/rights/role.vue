@@ -6,7 +6,7 @@
         <!-- 添加角色按钮 -->
         <el-row class="addrole">
             <el-col>
-                <el-button type="success" plain>添加角色</el-button>
+                <el-button @click="addroledialog=true" type="success" plain>添加角色</el-button>
             </el-col>
         </el-row>
         <!-- 表格 -->
@@ -91,7 +91,7 @@
                 label="操作">
                 <template slot-scope="scope">
                     <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
-                    <el-button  type="danger" size="mini" icon="el-icon-delete"></el-button>
+                    <el-button @click="handleDelete(scope.row.id)" type="danger" size="mini" icon="el-icon-delete"></el-button>
                     <el-button @click="SetRights(scope.row)" type="success" size="mini" icon="el-icon-check"></el-button>
                 </template>
             </el-table-column>
@@ -121,6 +121,24 @@
                 <el-button type="primary" @click="handleSetRightsList">确 定</el-button>
             </span>
         </el-dialog>
+        <!-- 添加角色 -->
+        <el-dialog
+            title="添加角色"
+            :visible.sync="addroledialog"
+            width="30%">
+            <el-form  :model="addform" label-width="100px" class="demo-ruleForm" :rules="rules" ref="ruleForm">
+                <el-form-item label="角色名称" prop="roleName" >
+                    <el-input v-model="addform.roleName" ></el-input>
+                </el-form-item>
+                 <el-form-item label="角色描述" prop="roleDesc">
+                    <el-input v-model="addform.roleDesc" ></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="addroledialog = false">取 消</el-button>
+                <el-button type="primary" @click="handleaddForm">确 定</el-button>
+            </span>
+        </el-dialog>
 
     </el-card>
 </template>
@@ -143,6 +161,23 @@ export default {
       defaultProps: {
         children: 'children',
         label: 'authName'
+      },
+      // 添加角色按钮的显示或者隐藏
+      addroledialog: false,
+      //   添加角色表单数据
+      addform: {
+        roleName: '',
+        roleDesc: ''
+      },
+      rules: {
+        roleName: [
+          { required: true, message: '请输入角色名称', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ],
+        roleDesc: [
+          { required: true, message: '请对角色进行描述', trigger: 'blur' },
+          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+        ]
       }
     };
   },
@@ -229,6 +264,57 @@ export default {
       } else {
         this.$message.error(msg);
       }
+    },
+    // 添加角色
+    async handleaddForm() {
+      this.$refs.ruleForm.validate(async (valid) => {
+        if (!valid) {
+          return this.$message.error('请完整输入内容');
+        }
+        const res = await this.$http.post('roles', this.addform);
+        const data = res.data;
+        const {meta: {status, msg}} = data;
+        if (status === 201) {
+          // 添加成功
+          // 关闭对话框
+          this.addroledialog = false;
+          // 重新加载数据
+          this.loadDate();
+          // 提示
+          this.$message.success(msg);
+          //   清空对话框
+          this.addform = {};
+        } else {
+          // 提示添加失败
+          this.$message.error(msg);
+        }
+      });
+    },
+    // 删除角色
+    async handleDelete (id) {
+      this.$confirm('此操作将永久删除该文件, 是否继续?', '提示', {
+        confirmButtonText: '确定',
+        cancelButtonText: '取消',
+        type: 'warning'
+      }).then(async () => {
+        const res = await this.$http.delete(`roles/${id}`);
+        const data = res.data;
+        const {meta: {status, msg}} = data;
+        if (status === 200) {
+          // 删除成功
+          // 重新加载数据列表
+          this.loadDate();
+          this.$message({
+            type: 'success',
+            message: msg
+          });
+        }
+      }).catch(() => {
+        this.$message({
+          type: 'info',
+          message: '已取消删除'
+        });
+      });
     }
   }
 };

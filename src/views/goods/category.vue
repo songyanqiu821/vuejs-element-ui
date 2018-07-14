@@ -3,7 +3,7 @@
         <my-breadcrumb level1="商品管理" level2="商品分类"></my-breadcrumb>
         <el-row>
             <el-col class="Addcategoryies">
-                <el-button plain type="success">添加分类</el-button>
+                <el-button @click="Addcategorydialog = true" type="success">添加分类</el-button>
             </el-col>
         </el-row>
         <!-- 表格 -->
