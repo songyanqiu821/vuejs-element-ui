@@ -41,6 +41,7 @@ export default {
       const data = res.data;
       const {meta: {status, msg}} = data;
       if (status === 200) {
+        console.log(this);
         // 登录成功
         // 获取token 并记录token 和sessionStorge
         const token = data.data.token;

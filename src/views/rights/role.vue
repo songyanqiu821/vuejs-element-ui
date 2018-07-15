@@ -14,7 +14,7 @@
             border
             stripe
             :data="list"
-            style="width: 100%">
+            style="width: 100%">/
             <!-- 展开列
             思路1、将一行分为2列，第一列是一级，
             2、再将第二列拆分成2列 一个显示二级 一个显示三级
@@ -90,7 +90,7 @@
             <el-table-column
                 label="操作">
                 <template slot-scope="scope">
-                    <el-button type="primary" size="mini" icon="el-icon-edit"></el-button>
+                    <el-button @click="editForm(scope.row)" type="primary" size="mini" icon="el-icon-edit"></el-button>
                     <el-button @click="handleDelete(scope.row.id)" type="danger" size="mini" icon="el-icon-delete"></el-button>
                     <el-button @click="SetRights(scope.row)" type="success" size="mini" icon="el-icon-check"></el-button>
                 </template>
@@ -139,6 +139,24 @@
                 <el-button type="primary" @click="handleaddForm">确 定</el-button>
             </span>
         </el-dialog>
+        <!-- 编辑角色 -->
+        <el-dialog
+            title="编辑角色"
+            :visible.sync="editroledialog"
+            width="30%">
+            <el-form  :model="addform" label-width="100px" class="demo-ruleForm" :rules="rules" ref="ruleForm">
+                <el-form-item label="角色名称" prop="roleName" >
+                    <el-input v-model="addform.roleName" ></el-input>
+                </el-form-item>
+                 <el-form-item label="角色描述" prop="roleDesc">
+                    <el-input v-model="addform.roleDesc" ></el-input>
+                </el-form-item>
+            </el-form>
+            <span slot="footer" class="dialog-footer">
+                <el-button @click="editroledialog = false">取 消</el-button>
+                <el-button type="primary" @click="handleEdit">确 定</el-button>
+            </span>
+        </el-dialog>
 
     </el-card>
 </template>
@@ -162,7 +180,9 @@ export default {
         children: 'children',
         label: 'authName'
       },
-      // 添加角色按钮的显示或者隐藏
+      //   编辑角色对话框的显示或者隐藏
+      editroledialog: false,
+      // 添加角色对话框的显示或者隐藏
       addroledialog: false,
       //   添加角色表单数据
       addform: {
@@ -172,11 +192,11 @@ export default {
       rules: {
         roleName: [
           { required: true, message: '请输入角色名称', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { min: 1, max: 5, message: '长度在 1 到 5 个字符', trigger: 'blur' }
         ],
         roleDesc: [
           { required: true, message: '请对角色进行描述', trigger: 'blur' },
-          { min: 3, max: 5, message: '长度在 3 到 5 个字符', trigger: 'blur' }
+          { min: 1, max: 8, message: '长度在 1 到 8 个字符', trigger: 'blur' }
         ]
       }
     };
@@ -283,7 +303,9 @@ export default {
           // 提示
           this.$message.success(msg);
           //   清空对话框
-          this.addform = {};
+          for (let key in this.addform) {
+            this.addform[key] = '';
+          }
         } else {
           // 提示添加失败
           this.$message.error(msg);
@@ -315,6 +337,33 @@ export default {
           message: '已取消删除'
         });
       });
+    },
+    // 点击编辑按钮显示列表
+    async editForm(role) {
+      // 显示对话框
+      this.editroledialog = true;
+      this.addform = role;
+      // this.addform.roleName = role.roleName;
+      // this.addform.roleDesc = role.roleDesc;
+    },
+    // 点击编辑对话框中的确定按钮的时候执行
+    async handleEdit() {
+      // console.log(this.addform);
+      const res = await this.$http.put(`roles/${this.addform.id}`, {
+        roleName: this.addform.roleName,
+        roleDesc: this.addform.roleDesc
+      });
+      const data = res.data;
+      const {meta: {status, msg}} = data;
+      if (status === 200) {
+        this.editroledialog = false;
+        this.loadDate();
+        this.$message.success(msg);
+        // 清空文本框
+        for (let key in this.addform) {
+          this.addform[key] = '';
+        }
+      }
     }
   }
 };
